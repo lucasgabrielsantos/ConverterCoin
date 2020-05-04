@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import br.com.android.challengeandroid.R
@@ -20,6 +21,8 @@ import br.com.android.challengeandroid.list.view.ListActivity.Companion.RC_LIST_
 import br.com.android.challengeandroid.list.view.ListActivity.Companion.RC_LIST_SOURCE
 import br.com.android.challengeandroid.repository.CoinRepository
 import br.com.android.challengeandroid.usecase.CoinUseCase
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.activity_home.*
 
 
 class HomeActivity : AppCompatActivity() {
@@ -28,8 +31,10 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var factory: HomeViewModelFactory
     private lateinit var viewModel: HomeViewModel
 
+    private lateinit var etValue: EditText
     private lateinit var etSource: EditText
     private lateinit var etDestiny: EditText
+    private lateinit var showError: AppCompatTextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +53,10 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
+        etSource = findViewById(R.id.et_source)
+        etDestiny = findViewById(R.id.et_destiny)
+        etValue = findViewById(R.id.et_value)
+
         findViewById<Button>(R.id.btn_show_list_source).setOnClickListener {
             showListSource()
         }
@@ -55,10 +64,13 @@ class HomeActivity : AppCompatActivity() {
             showListDestiny()
         }
         findViewById<Button>(R.id.btn_to_converter).setOnClickListener {
-            toConvert()
+            if (etValue.text.toString().isNotEmpty() ) {
+                toConvert()
+            } else {
+                Snackbar.make(btn_to_converter, "Digite um valor para ser convertido", Snackbar.LENGTH_LONG).show()
+                etValue.error = "Campo vazio"
+            }
         }
-        etSource = findViewById(R.id.et_source)
-        etDestiny = findViewById(R.id.et_destiny)
     }
 
     private fun initObservable() {
@@ -67,14 +79,6 @@ class HomeActivity : AppCompatActivity() {
                 is HomeEvent.SuccessPrice -> successPrice(it.price)
             }
         })
-    }
-
-    private fun showLoading() {
-        // mostra loading
-    }
-
-    private fun showError(message: String) {
-        // mostra erro
     }
 
     private fun showListSource() {

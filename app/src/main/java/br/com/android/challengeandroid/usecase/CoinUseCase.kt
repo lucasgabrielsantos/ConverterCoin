@@ -16,6 +16,7 @@ class CoinUseCase(private var repository: CoinRepository) {
                     )
                 }
             }
+            auxList.sortBy { it.name }
             return auxList
         } else {
             //tratar erro
